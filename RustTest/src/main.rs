@@ -1,42 +1,61 @@
-use std::{fmt};
+use std::{fmt, thread, time::Duration};
 
 fn main() {
-    println!("Hello, world!");
     let mut state = [[Cell::Dead; 50]; 50];
     let mut next = [[Cell::Dead; 50]; 50];
-    state[0][1] = Cell::Alive;
-    state[0][2] = Cell::Alive;
-    state[1][1] = Cell::Alive;
-    state[3][0] = Cell::Alive;
-    loop {
-
-        let x = 0;
-        let y = 0;
+    state[7][10] = Cell::Alive;
+    state[6][10] = Cell::Alive;
+    state[5][10] = Cell::Alive;
+    state[7][11] = Cell::Alive;
+    state[6][12] = Cell::Alive;
+    while true {
+        println!("Hello, newest world!");
+        let mut x = 0;
+        let mut y = 0;
 
         while x < 50 {
+            y = 0;
             while y < 50 {
-                if x > 0 && x < 50 && y > 0 && y < 50 {
+                if x > 0 && x < 49 && y > 0 && y < 49 {
                     let mut lupe = 0;
                     let neighbors = [state[x-1][y],state[x+1][y],state[x-1][y-1],state[x+1][y-1],state[x-1][y+1],state[x+1][y+1],state[x][y-1],state[x][y+1],];
+                    let mut liveneighbors = 0;
                     while lupe < 8 {
-                        let mut liveneighbors = 0;
                         if neighbors[lupe] == Cell::Alive{
-                            liveneighbors += 1
+                            liveneighbors += 1;
                         }
-                        if liveneighbors >= 2 && liveneighbors <= 3 {
-                            next[y][x] = Cell::Alive
-                        }
+                        lupe += 1
+                    }
+
+                    if state[x][y] == Cell::Alive && liveneighbors >= 2 && liveneighbors <= 3 {
+                        next[x][y] = Cell::Alive
+                    }
+                    else if state[x][y] == Cell::Dead && liveneighbors == 3 {
+                        next[x][y] = Cell::Alive
+                    }
+                    else if state[x][y] == Cell::Alive && liveneighbors < 2 {
+                        next[x][y] = Cell::Dead
+                    }
+                    else if state[x][y] == Cell::Alive && liveneighbors > 3 {
+                        next[x][y] = Cell::Dead
                     }
                 }
+                else {
+                }
+                y += 1
             }
+            x += 1
         }
         println!("Hello, new world!");
-        println!("{:?}", format!("{:?}", state));
-        state = next
+        for line in state {
+            println!("{:?}", format!("{:?}", line));
+        }
+        state = next;
+        thread::sleep(Duration::from_millis(400));
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 
 pub enum Cell {
     Dead = 0,
@@ -48,25 +67,6 @@ impl std::fmt::Debug for Cell{
         match *self {
             Cell::Dead => write!(f,"⎔"),
             Cell::Alive => write!(f,"⬢"),
-        }
-    }
-}
-
-impl PartialEq for Cell {
-    fn eq(&self, other: &Self) -> bool {
-        if self == other {
-            return true
-        }
-        else {
-            return false
-        }
-    }
-    fn ne(&self, other: &Self) -> bool {
-        if self != other {
-            return true
-        }
-        else {
-            return false
         }
     }
 }
